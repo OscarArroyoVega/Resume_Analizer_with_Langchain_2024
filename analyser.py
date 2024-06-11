@@ -1,6 +1,7 @@
 import numpy as np
 import seaborn as sns
 import pandas as pd
+import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from math import pi
@@ -14,6 +15,7 @@ from data.unify_endpoints_data import model_provider, dynamic_provider
 from langchain_unify.chat_models import ChatUnify
 from sentence_transformers import SentenceTransformer, util
 from httpx import LocalProtocolError
+
 
 # Function to extract text from a PDF or DOCX document
 def extract_text_from_file(file):
@@ -117,6 +119,7 @@ except LocalProtocolError as e:
         )
     else:
         raise e
+
 
 def feature_match_function(resume_text, job_offer):
     with st.spinner("Setting up the model..."):
@@ -415,53 +418,6 @@ def apply_changes_function (resume_text, job_offer, suggested_changes):
                                             )
         return resume_updated_text 
 
-           
-def job_titles_list_function (resume_text, num_job_offers,job_title):
-    job_titles_prompt = PromptTemplate(
-        input_variables=["resume_text", "num_job_offers"],
-        template=""" You are an AI assistant designed to enhance and optimize resumes to better match specific job offers.
-        Given a resume ({resume_text}) and an integer ({num_job_offers}) and the current job_title ({job_title})::
-            1.Identify and return a list of the {num_job_offers} alternative job titles to the current one that best match the skills and experience described in the resume. 
-            2.Focus on titles that directly align with the candidate's qualifications and consider factors like keywords, technologies mentioned, and past job roles.
-        
-        Return just the list of job titles as a bullet-point list.  
-        
-        resume_text: {resume_text}
-        num_job_offers: {num_job_offers}
-        job_title: {job_title}
-        """
-    )
-    with st.sidebar.container(border=True):
-        st.text(f"Running prompt: {job_titles_prompt.template}")
-    job_titles_chain = LLMChain(llm=model, prompt=job_titles_prompt, verbose=False)
-    with st.spinner("generating job titles..."):
-        job_titles = job_titles_chain.run(resume_text=st.session_state.resume_text,
-                                            num_job_offers=st.session_state.num_job_offers_input,
-                                            job_title=st.session_state.job_title                                        
-                                            )
-        return job_titles  
-
-
-def custom_prompt_function(user_prompt, resume_text, job_offer, job_title):
-    custom_user_prompt = PromptTemplate(
-        input_variables=[ "user_prompt","resume_text", "job_offer", "job_title"],
-        template="""You are an AI assistant designed to enhance and optimize resumes to better match specific job offers.
-        Given the user prompt as a query to answer and use the resume, job offer, and job title as context to provide a short answer that addresses the user's query.
-        user_prompt: {user_prompt}
-        resume_text: {resume_text}
-        job_offer: {job_offer}
-        job_title: {job_title}
-        """
-    )
-    custom_prompt_chain = LLMChain(llm=model, prompt=custom_user_prompt, verbose=False)
-    custom_QA = custom_prompt_chain.run(user_prompt=st.session_state.user_prompt,
-                                        resume_text=st.session_state.resume_text,
-                                        job_offer=st.session_state.job_offer_text,
-                                        job_title=st.session_state.job_title,
-                                            
-                                        )
-    return custom_QA
-    
 
 def create_radar_chart(data):
     
@@ -529,11 +485,216 @@ def create_bar_plot(data):
     plt.tight_layout()
     sns.despine()  
     plt.show()    
+
+
+def extract_resume_information(resume_text):
+    skill_list_prompt = PromptTemplate(
+        input_variables=["resume_text"],
+        template="""
+        You are an AI assistant designed to extract specific information from resumes.
+        Given the resume text, perform the following tasks:
+
+        1. Extract and list the following information:
+        - Soft skills
+        - Hard skills
+        - General keywords in the resume
+        - Keywords in professional experiences
+        - Keywords in education and certifications
+        - Other relevant knowledge keywords
+
+        2. Provide the output in strict JSON format using the template below. Ensure that the JSON format is strictly followed to avoid parsing errors:
+
+        {{
+            "soft_skills": ["soft_skill1", "soft_skill2", "..."],
+            "hard_skills": ["hard_skill1", "hard_skill2", "..."],
+            "keywords": ["keyword1", "keyword2", "..."],
+            "experience": ["experience1", "experience2", "..."],
+            "education_and_certifications": ["education1", "certification1", "..."],
+            "other_knowledge": ["other_knowledge1", "other_knowledge2", "..."]
+        }}
+
+        Ensure that the JSON output is properly formatted and can be parsed without errors. Do not include any additional text or explanations outside the specified format.
+
+        resume_text: {resume_text}
+        """
+        )
     
+    skill_list_chain = LLMChain(llm=model, prompt=skill_list_prompt, verbose=False)
+    with st.spinner("extracting skills from resume..."):
+        skill_list = skill_list_chain.run(resume_text=st.session_state.resume_text)
+        # Parse JSON string to dictionary
+        json_start1 = skill_list.index("{")
+        json_end1 = skill_list.rindex("}") + 1
+        json_part1 = skill_list[json_start1:json_end1]
+        skill_dict = json.loads(json_part1)
+        if not isinstance(skill_dict, dict):
+                st.warning("Output is not a dictionary. Try again or try another model.")
+    return skill_dict
+
+
+def job_titles_list_function (resume_text, num_job_offers, job_title):
+    job_titles_prompt = PromptTemplate(
+        input_variables=["resume_text", "num_job_offers", "job_title"],
+        template = """
+        You are an AI assistant designed to enhance and optimize resumes to better match specific job offers.
+        Given a resume ({resume_text}), an integer ({num_job_offers}), and the current job title ({job_title}), follow these steps:
+
+        1. Identify and generate a list of the {num_job_offers} alternative job titles to the current job title that best match the skills and experience described in the resume.
+            - Ensure the job titles generated in the list are directly aligned with the candidate's qualifications and consider factors like keywords, technologies mentioned, and past job roles.
+        2. Generate a list of requirements for each alternative job title in the list you have created.
+            - The requirements should include skills, experiences, qualifications, and other relevant keywords that are commonly associated with each job title.
+        3. Provide an output in strict JSON format listing each job title and the most prevalent requirements for it, and don't output anything else.
+
+        Here is the JSON format you must follow:
+       
+        {{
+            "title_1": ["skill_11", "skill_12", "..."],
+            "title_2": ["skill_21", "skill_22", "..."],
+            "title_3": ["skill_31", "skill_32", "..."]
+        }}
+
+        Ensure that the JSON output is properly formatted and can be parsed without errors. Do not include any additional text or explanations outside the specified format.
+
+        resume_text: {resume_text}
+        num_job_offers: {num_job_offers}
+        job_title: {job_title}
+        """
+    )
+    # TODO: upgrade reliability for this function: 
+        # Grounding information for the job_title and the requirements. Pick reliable information from https://www.onetcenter.org/database.html#all-files or similar databases.
     
+    with st.sidebar.container(border=True):
+        st.text(f"Running prompt: {job_titles_prompt.template}")
+    job_titles_chain = LLMChain(llm=model, prompt=job_titles_prompt, verbose=False)
+    with st.spinner("Exploring alternative job titles..."):
+        job_titles_json = job_titles_chain.run(resume_text=st.session_state.resume_text,
+                                            num_job_offers=st.session_state.num_job_offers_input,
+                                            job_title=st.session_state.job_title                                        
+                                            )# Parse JSON string to dictionary
+        json_start2 = job_titles_json.index("{")
+        json_end2 = job_titles_json.rindex("}") + 1
+        json_part2 = job_titles_json[json_start2:json_end2]
+        job_titles_dict = json.loads(json_part2)
+        if not isinstance(job_titles_dict, dict):
+            st.warning("Output is not a dictionary. Try again or try another model.")
+        return job_titles_dict 
+
+def calculate_semantic_similarity(skills, requirements, threshold=0.5):
+    """
+    Calculate the semantic similarity between skills and requirements.
     
+    Parameters:
+    - skills (list): List of skills.
+    - requirements (list): List of requirements.
+    - threshold (float): Minimum similarity score to create an edge.
+    
+    Returns:
+    - edges (list): List of edges with weights.
+    """
+    model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+    edges = []
+
+    skill_embeddings = model.encode(skills, convert_to_tensor=True)
+    requirement_embeddings = model.encode(requirements, convert_to_tensor=True)
+
+    similarity_matrix = util.pytorch_cos_sim(skill_embeddings, requirement_embeddings)
+
+    for i, skill in enumerate(skills):
+        for j, requirement in enumerate(requirements):
+            score = similarity_matrix[i][j].item()
+            if score > threshold:
+                edges.append((skill, requirement, score))
+    
+    return edges
+
+def create_knowledge_graph_with_similarity(resume_info, job_titles_dict, threshold=0.5):
+    """
+    Creates a knowledge graph with job titles and their corresponding skills based on semantic similarity.
+    
+    Parameters:
+    - resume_info (dict): A dictionary containing skills and other information from the resume.
+    - job_titles_dict (dict): A dictionary containing job titles and their requirements.
+    - threshold (float): Minimum similarity score to create an edge.
+    
+    Returns:
+    - G (networkx.Graph): The generated knowledge graph.
+    """
+    G = nx.Graph()
+
+    # Add resume skills to the graph
+    all_skills = []
+    for category, skills in resume_info.items():
+        for skill in skills:
+            G.add_node(skill, label=category)
+            all_skills.append(skill)
+
+    # Add job titles and their requirements to the graph
+    all_requirements = []
+    for job_title, requirements in job_titles_dict.items():
+        G.add_node(job_title, label="job_title")
+        for requirement in requirements:
+            G.add_node(requirement, label="requirement")  # Add this line to add requirement as a node
+            G.add_edge(job_title, requirement, weight=1)  # Add this line to add an edge between job_title and requirement
+            all_requirements.append(requirement)
+
+    # Calculate semantic similarity and add edges based on the threshold
+    edges = calculate_semantic_similarity(all_skills, all_requirements, threshold=0.2)
+    for skill, requirement, score in edges:
+        G.add_edge(skill, requirement, weight=score)
+        
+
+    # Drawing the graph
+    plt.figure(figsize=(40, 35))
+    pos = nx.spring_layout(G, k=0.3, seed=42)  # Adjusted for better spacing
+
+    # Separate job title nodes and skill nodes based on their labels
+    job_title_nodes = [node for node, data in G.nodes(data=True) if data.get('label') == 'job_title']
+    skill_nodes = [node for node, data in G.nodes(data=True) if data.get('label') != 'job_title']
+
+    nx.draw_networkx_nodes(G, pos, nodelist=job_title_nodes, node_color='skyblue', node_size=5000, label='Job Titles')
+    nx.draw_networkx_nodes(G, pos, nodelist=skill_nodes, node_color='orange', node_size=3000, label='Skills')
+    
+    nx.draw_networkx_labels(G, pos, font_size=10, font_color='black', font_weight='bold')
+    edges = G.edges(data=True)
+    nx.draw_networkx_edges(G, pos, edgelist=edges, edge_color='gray', width=[d['weight'] * 5 for (u, v, d) in edges])
+
+    plt.title("Knowledge Graph of Job Titles and Skills")
+    plt.legend(scatterpoints=1)
+    plt.show()
+    
+    # Display the plot in Streamlit
+    st.pyplot(plt)
+    
+    return G
+
+
+
+
+
+def custom_prompt_function(user_prompt, resume_text, job_offer, job_title):
+    custom_user_prompt = PromptTemplate(
+        input_variables=[ "user_prompt","resume_text", "job_offer", "job_title"],
+        template="""You are an AI assistant designed to enhance and optimize resumes to better match specific job offers.
+        Given the user prompt as a query to answer and use the resume, job offer, and job title as context to provide a short answer that addresses the user's query.
+        user_prompt: {user_prompt}
+        resume_text: {resume_text}
+        job_offer: {job_offer}
+        job_title: {job_title}
+        """
+    )
+    custom_prompt_chain = LLMChain(llm=model, prompt=custom_user_prompt, verbose=False)
+    custom_QA = custom_prompt_chain.run(user_prompt=st.session_state.user_prompt,
+                                        resume_text=st.session_state.resume_text,
+                                        job_offer=st.session_state.job_offer_text,
+                                        job_title=st.session_state.job_title,
+                                            
+                                        )
+    return custom_QA
+       
+
 # UI main structure
 tab1, tab2, tab3, tab4 = st.tabs(["Resume VS Job offer","Improve your Resume", "Job Search", "Try your custom prompt"])
+
 
 with tab1:
     col1, col2, col3 = st.columns(3)
@@ -549,9 +710,10 @@ with tab2:
     container2 = st.container(border=True)
     
 with tab3:
-    col1, col2= st.columns(2)
-    feature_suggested_titles_button = col1.button("TITLE NAMES FOR JOB SEARCH")
-    st.session_state.num_job_offers_input = col2.slider('Select number of job offers', 1, 20, 5)
+    col1, col2, col3 = st.columns(3)
+    st.session_state.num_job_offers_input = col1.slider('Select number of job offers', 1, 10, 3)
+    feature_suggested_titles_button = col2.button("TITLE NAMES FOR JOB SEARCH")
+    graph_button = col3.button("Generate Knowledge Graph")
     container3 = st.container(border=True)
     
 with tab4:
@@ -694,13 +856,23 @@ with container3:
             #     st.session_state.num_job_offers_input = num_job_offers_input
                 
             suggested_job_titles_answer = job_titles_list_function(resume_text=st.session_state.resume_text, 
-                                                                    num_job_offers=st.session_state.num_job_offers_input
-                                                                    )
+                                                                num_job_offers=st.session_state.num_job_offers_input,
+                                                                job_title=st.session_state.job_title
+                                                                )
             st.markdown("##### Other matching Job Titles")
             st.write("Suggested job titles based on the candidate's profile can expand the job search, uncovering opportunities that were previously overlooked.")
             suggested_job_titles_text= suggested_job_titles_answer.strip()
-            st.write(suggested_job_titles_text)       
-                
+            st.write(suggested_job_titles_text) 
+            
+    if graph_button:
+        if st.session_state.resume_text:
+            job_titles_dict = job_titles_list_function(resume_text=st.session_state.resume_text, 
+                                                                num_job_offers=st.session_state.num_job_offers_input,
+                                                                job_title=st.session_state.job_title
+                                                                )
+            resume_info = extract_resume_information(resume_text=st.session_state.resume_text)
+            G = create_knowledge_graph_with_similarity(resume_info, job_titles_dict)
+                           
 with container4:           
     if submit_user_prompt_button:
         if st.session_state.job_title and st.session_state.job_offer_text and st.session_state.resume_text:
