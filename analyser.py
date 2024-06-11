@@ -416,9 +416,9 @@ def apply_changes_function (resume_text, job_offer, suggested_changes):
         return resume_updated_text 
 
            
-def job_titles_list_function (resume_text, num_job_offers,job_title):
+def job_titles_list_function (resume_text, num_job_offers, job_title):
     job_titles_prompt = PromptTemplate(
-        input_variables=["resume_text", "num_job_offers"],
+        input_variables=["resume_text", "num_job_offers", "job_title"],
         template=""" You are an AI assistant designed to enhance and optimize resumes to better match specific job offers.
         Given a resume ({resume_text}) and an integer ({num_job_offers}) and the current job_title ({job_title})::
             1.Identify and return a list of the {num_job_offers} alternative job titles to the current one that best match the skills and experience described in the resume. 
@@ -694,7 +694,8 @@ with container3:
             #     st.session_state.num_job_offers_input = num_job_offers_input
                 
             suggested_job_titles_answer = job_titles_list_function(resume_text=st.session_state.resume_text, 
-                                                                    num_job_offers=st.session_state.num_job_offers_input
+                                                                    num_job_offers=st.session_state.num_job_offers_input,
+                                                                    job_title=st.session_state.job_title
                                                                     )
             st.markdown("##### Other matching Job Titles")
             st.write("Suggested job titles based on the candidate's profile can expand the job search, uncovering opportunities that were previously overlooked.")
