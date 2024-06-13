@@ -10,6 +10,14 @@ Your browser does not support the video tag.
 
 LLM RESUME ANALYSER is an application that allows you to improve your CV using many Language Model analysis and suggestions
 
+## Tech Stack
+Streamlit: Used for creating the web application interface that is intuitive and interactive.
+
+Unify AI: Provides the backend LLMs that power the interactions within the application. Unify's API is utilized to send prompts to the LLMs and receive their responses in real-time.
+
+Langchain: LangChain is a powerful framework designed for building applications that integrate with large language models (LLMs), enabling complex interactions and workflows by chaining together various components like prompts, LLMs, and data sources
+
+
 ## Introduction
  
 You find more model/provider information in the [Unify benchmark interface](https://unify.ai/hub).
@@ -23,9 +31,13 @@ You find more model/provider information in the [Unify benchmark interface](http
 6. Gain insights on Resume match with the job offer and on how to improve your Resume
 
 ## Repository and Deployment
-The repository is located at [LLM Resume Analiser](https://github.com/OscarArroyoVega/LLM_Resume_Analyser_Unify).
+The repository link: (https://github.com/OscarArroyoVega/LLM_Resume_Analyser_Unify) or
+                     (https://github.com/Sanjay8602/LLM-Resume-Analyser-using-Unify).
 To run the application locally, follow these steps:
 1. Clone the repository to your local machine.
+```bash
+git clone https://github.com/Sanjay8602/LLM-Resume-Analyser-using-Unify
+```
 2. Set up your virtual environment and install the dependencies from `requirements.txt`:
 ```bash
 python -m venv .venv    # create virtual environment 
@@ -44,9 +56,9 @@ python -m streamlit run analyser.py
 
 ## Contributors
 
-| Name | GitHub Profile |
-|------|----------------|
-| contB | [PROFileB](https://--) |
-| contribC | [PROFileC](https://github...) |
-| contribA | [PROFileA](https://github....) |
-| contribA | [PROFileA](https://github....) |
+|       Name       |                  GitHub Profile                 |
+|------------------|-------------------------------------------------|
+| Sanjay Suthar    | [Sanjay0806](https://github.com/Sanjay8602)     |
+| OscarArroyoVega  | [OscarAV](https://github.com/OscarArroyoVega)   |
+| Mayssa Rekik     | [Mayssa Rekik](https://github.com/iammayssa)    |
+| Jeya Balang      | [Jeyabalang](https://github.com/jeyabalang)     |
