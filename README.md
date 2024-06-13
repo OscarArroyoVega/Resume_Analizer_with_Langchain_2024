@@ -1,7 +1,7 @@
 # LLM-Resume-Analyser-using-Unify 
 
 
-[Demo](video link inside brackets) 
+[Demo](https://github.com/OscarArroyoVega/LLM_Resume_Analyser_Unify/assets/103512255/5cfbb620-e6e1-4cbb-b619-1b087e0b379b) 
 
 <video width="640" height="480" autoplay>
   <source src="video.mp4 file saved in repository folder" type="video/mp4">
