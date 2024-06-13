@@ -4,7 +4,7 @@
 [Demo](https://github.com/OscarArroyoVega/LLM_Resume_Analyser_Unify/assets/103512255/5cfbb620-e6e1-4cbb-b619-1b087e0b379b) 
 
 <video width="640" height="480" autoplay>
-  <source src="video.mp4 file saved in repository folder" type="video/mp4">
+  <source src="[Demo](https://github.com/OscarArroyoVega/LLM_Resume_Analyser_Unify/assets/103512255/5cfbb620-e6e1-4cbb-b619-1b087e0b379b)" type="video/mp4">
 Your browser does not support the video tag.
 </video>
 
@@ -58,7 +58,7 @@ python -m streamlit run analyser.py
 
 |       Name       |                  GitHub Profile                 |
 |------------------|-------------------------------------------------|
-| Sanjay Suthar    | [Sanjay0806](https://github.com/Sanjay8602)     |
 | OscarArroyoVega  | [OscarAV](https://github.com/OscarArroyoVega)   |
 | Mayssa Rekik     | [Mayssa Rekik](https://github.com/iammayssa)    |
+| Sanjay Suthar    | [Sanjay0806](https://github.com/Sanjay8602)     |
 | Jeya Balang      | [Jeyabalang](https://github.com/jeyabalang)     |
