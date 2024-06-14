@@ -8,7 +8,20 @@
 Your browser does not support the video tag.
 </video>
 
-LLM RESUME ANALYSER is an application that allows you to improve your CV using many Language Model analysis and suggestions
+LLM Resume Analyser: A Comprehensive LLM-Powered Demo App
+
+The LLM Resume Analyser demonstrates the transformative potential of large language models (LLMs) in recruitment, connecting job applicants with employers or recruiters.
+
+Key Features:
+
+Resume Analysis: Extracts and analyzes key skills and qualifications from resumes.
+Matching Score: Computes a match score for resumes against job descriptions.
+Semantic Matching: Uses the Unify API to semantically analyze and match resumes with job descriptions using multiple LLMs.
+Distributed Skills Match: Highlights how job requirements are represented across all applicant skills and experiences.
+Suggestions and Resume Improvement: Provides suggestions for resume enhancement and compares the original with the improved version.
+Alternative Job Titles: Suggests other job titles that match the resume.
+Custom Model Utilization: Allows dynamic routing and integration of various models under OpenAI standards.
+The app leverages the Unify API for dynamic routing and access to various models, ensuring precise and comprehensive recruitment analysis.
 
 ## Tech Stack
 Streamlit: Used for creating the web application interface that is intuitive and interactive.
@@ -16,6 +29,8 @@ Streamlit: Used for creating the web application interface that is intuitive and
 Unify AI: Provides the backend LLMs that power the interactions within the application. Unify's API is utilized to send prompts to the LLMs and receive their responses in real-time.
 
 Langchain: LangChain is a powerful framework designed for building applications that integrate with large language models (LLMs), enabling complex interactions and workflows by chaining together various components like prompts, LLMs, and data sources
+
+
 
 
 ## Introduction
