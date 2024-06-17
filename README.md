@@ -74,6 +74,6 @@ python -m streamlit run analyser.py
 |       Name       |                  GitHub Profile                 |
 |------------------|-------------------------------------------------|
 | OscarArroyoVega  | [OscarAV](https://github.com/OscarArroyoVega)   |
-| Mayssa Rekik     | [Mayssa Rekik](https://github.com/iammayssa)    |
 | Sanjay Suthar    | [Sanjay0806](https://github.com/Sanjay8602)     |
+| Mayssa Rekik     | [Mayssa Rekik](https://github.com/iammayssa)    |
 | Jeya Balang      | [Jeyabalang](https://github.com/jeyabalang)     |
