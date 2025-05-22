@@ -1,5 +1,4 @@
-# LLM-Resume-Analyser-using-Unify 
-
+# Resume Analyser: a Deliverative Agent using Unify LLMs. Langchain as orchestrator. June 2024
 
 [Demo](https://github.com/OscarArroyoVega/LLM_Resume_Analyser_Unify/assets/103512255/5cfbb620-e6e1-4cbb-b619-1b087e0b379b) 
 
