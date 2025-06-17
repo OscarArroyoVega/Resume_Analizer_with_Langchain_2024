@@ -1,11 +1,13 @@
 # Resume Analyser, many LLMs consensus to reduce allucinations, bias and outliers. This is a ReAct Agent deno using Unify LLMs. Langchain as orchestrator. June 2024
 
-[Demo](https://github.com/OscarArroyoVega/Resume_Analizer_with_Langchain_2024/raw/main/data/resume_analyser.mp4)
+[Demo](https://github.com/Sanjay8602/LLM-Resume-Analyser-using-Unify/assets/121057369/a645f849-4617-43db-8936-3a279787f03b) 
 
-<video width="640" height="480" controls>
-  <source src="https://github.com/OscarArroyoVega/Resume_Analizer_with_Langchain_2024/raw/main/data/resume_analyser.mp4" type="video/mp4">
-  Your browser does not support the video tag.
+
+<video width="640" height="480" autoplay>
+  <source src="video.mp4 file saved in repository folder" type="video/mp4">
+Your browser does not support the video tag.
 </video>
+
 
 
 LLM Resume Analyser: A Comprehensive LLM-Powered Demo App
