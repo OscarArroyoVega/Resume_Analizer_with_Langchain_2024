@@ -3,7 +3,7 @@
 [Demo](https://github.com/OscarArroyoVega/Resume_Analizer_with_Langchain_2024/blob/main/data/recruiting_app_unify.mp4) 
 
 <video width="640" height="480" autoplay>
-  <source src="[Demo](https://github.com/OscarArroyoVega/LLM_Resume_Analyser_Unify/assets/103512255/5cfbb620-e6e1-4cbb-b619-1b087e0b379b)" type="video/mp4">
+  <source src="[Demo](https://github.com/OscarArroyoVega/Resume_Analizer_with_Langchain_2024/blob/main/data/recruiting_app_unify.mp4)" type="video/mp4">
 Your browser does not support the video tag.
 </video>
 
