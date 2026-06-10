@@ -1,6 +1,6 @@
 > ⏸️ This repo is not actively maintained at the moment. Kept for reference.
 
-# Resume Analyser, many LLMs consensus to identify and reduce allucinations, bias and outliers. This is a multistep program (not a ReAct agent) that uses many LLMs to peform operations of classification and evaluation to then process the results with classical DS techniches. Langchain acts as orchestrator. June 2024
+### Resume Analyser, many LLMs consensus to identify and reduce allucinations, bias and outliers. This is a multistep program (not a ReAct agent) that uses many LLMs to peform operations of classification and evaluation to then process the results with classical DS techniches. Langchain acts as orchestrator. June 2024
 
 [Demo](https://github.com/Sanjay8602/LLM-Resume-Analyser-using-Unify/assets/121057369/a645f849-4617-43db-8936-3a279787f03b) 
 
